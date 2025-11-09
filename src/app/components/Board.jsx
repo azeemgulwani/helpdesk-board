@@ -43,3 +43,28 @@ export default function Board() {
       ignore = true;
     };
   }, []);
+
+  // live updates every ~8s (within 6–10s), cleanup on unmount
+  useEffect(() => {
+    if (!tickets.length) return;
+
+    const interval = setInterval(() => {
+      setTickets((prev) => {
+        if (!prev.length) return prev;
+        const i = Math.floor(Math.random() * prev.length);
+        const changed = { ...prev[i] };
+        if (Math.random() < 0.5) {
+          changed.status = nextStatus[changed.status] || changed.status;
+        } else {
+          changed.priority = escalatePriority[changed.priority] || changed.priority;
+        }
+        changed.updatedAt = new Date().toISOString();
+
+        const copy = [...prev];
+        copy[i] = changed;
+        return copy;
+      });
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [tickets.length]);
