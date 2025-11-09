@@ -68,3 +68,64 @@ export default function Board() {
 
     return () => clearInterval(interval);
   }, [tickets.length]);
+
+  // derive visible tickets from filters + search
+  const visibleTickets = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return tickets.filter((t) => {
+      const sOk = filters.status === 'All' || t.status === filters.status;
+      const pOk = filters.priority === 'All' || t.priority === filters.priority;
+      const qOk =
+        !q ||
+        t.title.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q);
+      return sOk && pOk && qOk;
+    });
+  }, [tickets, filters, search]);
+
+  // queue helpers
+  const addToQueue = (id) => setQueue((q) => (q[id] ? q : { ...q, [id]: true }));
+  const removeFromQueue = (id) =>
+    setQueue((q) => {
+      if (!q[id]) return q;
+      const c = { ...q };
+      delete c[id];
+      return c;
+    });
+  const clearQueue = () => setQueue({});
+
+  return (
+    <div className="grid gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <StatusFilter
+          value={filters.status}
+          onChange={(v) => setFilters((f) => ({ ...f, status: v }))}
+        />
+        <PriorityFilter
+          value={filters.priority}
+          onChange={(v) => setFilters((f) => ({ ...f, priority: v }))}
+        />
+        <SearchBox value={search} onChange={setSearch} />
+      </section>
+
+      <StatusMessage
+        loading={loading}
+        error={error}
+        isEmpty={!loading && !error && visibleTickets.length === 0}
+      />
+
+      {!loading && !error && visibleTickets.length > 0 && (
+        <TicketList tickets={visibleTickets} queue={queue} onAddToQueue={addToQueue} />
+      )}
+
+      <MyQueueSummary
+        tickets={Object.keys(queue)
+          .map((id) => tickets.find((t) => t.id === id))
+          .filter(Boolean)}
+        count={Object.keys(queue).length}
+        onRemove={removeFromQueue}
+        onClear={clearQueue}
+      />
+    </div>
+  );
+}
