@@ -7,12 +7,15 @@ A Next.js + Tailwind CSS app (JavaScript + JSX only) for browsing, filtering, se
 ## Setup
 
 npm install
+
 npm run dev
-# visit http://localhost:3000
+
+## visit http://localhost:3000
 
 ## Production
 
 npm run build
+
 npm start
 
 
