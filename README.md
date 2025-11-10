@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Helpdesk Ticket Board
 
-## Getting Started
+A Next.js + Tailwind CSS app (JavaScript + JSX only) for browsing, filtering, searching, and queueing helpdesk tickets with simulated live updates.
 
-First, run the development server:
+---
 
-```bash
+## Setup
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# visit http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Production
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+npm run build
+npm start
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Features Checklist
+Core Functionality
 
-To learn more about Next.js, take a look at the following resources:
+1. Loads ticket data dynamically from /api/tickets
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Displays 15 sample tickets with varied priorities and statuses
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Supports real-time updates — every ~8 seconds a random ticket’s status or priority changes
 
-## Deploy on Vercel
+Filtering & Search
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Status Filter: All / Open / In Progress / On Hold / Resolved
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Priority Filter: All / Low / Medium / High / Critical
+
+3. Search Box: Filters tickets instantly by title or description (case-insensitive)
+
+My Queue
+
+1. Add any ticket to My Queue
+
+2. Prevents duplicates and disables the button for queued tickets
+
+3. Remove individual tickets or clear the entire queue
+
+4. Shows total queued count and ticket titles
+
+Status & UX
+
+1. Loading State: “Loading…” message while fetching data
+
+2. Error State: “Unable to load tickets.” if fetch fails
+
+3. Empty State: “No tickets match your filters.” when no results
+
+4. Disabled buttons when actions aren’t available
+
+5. Responsive grid layout with clean Tailwind styling
+
+Technical Details
+
+1. page.js is a Server Component
+
+2. All interactive components (Board, filters, list, etc.) are Client Components using 'use client'
+
+3. Board holds lifted state (tickets, filters, search, queue)
+
+4. Clean useEffect hooks for data fetch and live-update interval (with proper cleanup)
+
+5. Uses plain .js / .jsx files — no TypeScript
+
+6. Utility file severity.js defines priorityOrder, statusOrder, and simple mapping helpers
+
+## How It Works
+API: GET /api/tickets serves 15 sample tickets (src/app/api/tickets/route.js)
+
+Board: Fetches data, manages filters/search/queue, and simulates live updates every ~8s
+
+Filters/Search: Case-insensitive match on title/description; status/priority selects
+
+Queue: Add/remove items and clear all; no duplicates stored
+
+Utilities: src/app/lib/severity.js exports priorityOrder, statusOrder, plus simple status/priority progressions
+
+##File Structure
+
+src/
+  app/
+    page.js
+    api/
+      tickets/
+        route.js
+    components/
+      Board.jsx
+      TicketList.jsx
+      TicketCard.jsx
+      StatusFilter.jsx
+      PriorityFilter.jsx
+      SearchBox.jsx
+      MyQueueSummary.jsx
+      StatusMessage.jsx
+    lib/
+      severity.js
+
+## Notes
+1. page.js is a Server Component
+
+2. All interactive components start with 'use client'
+
+3. No TypeScript; only .js / .jsx files
